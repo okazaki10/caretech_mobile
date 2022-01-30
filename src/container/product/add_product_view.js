@@ -8,15 +8,17 @@ import style, { colors } from '../../globalstyles';
 import MasonryList from '@react-native-seoul/masonry-list';
 import Modal from 'react-native-modal';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import axiosFetch from '../../base_url';
+
 function AddProductView(props) {
     const { height, width } = Dimensions.get('window');
-    const [total, settotal] = useState('0')
     const [name, setName] = useState('')
     const [description, setDescription] = useState('')
     const [sku, setSku] = useState('')
     const [stock, setStock] = useState('')
     const [category, setCategory] = useState(0)
     const [price, setPrice] = useState('')
+    const [imageLink, setImageLink] = useState('')
     const [imageData, setImageData] = useState('')
     const categories = ['Wash and Fold', 'Dry Clean', 'Home', 'Others']
 
@@ -25,11 +27,10 @@ function AddProductView(props) {
         setModalVisible4(!isModalCameraVisible);
     };
     const options = {
-
         saveToPhotos: true,
         mediaType: 'photo',
         includeBase64: true,
-
+        quality: 0.5,
     }
     const [modalHide, setModalHide] = useState(false)
     const bukakamera = () => {
@@ -42,9 +43,9 @@ function AddProductView(props) {
                 ToastAndroid.show(response.errorMessage == "Permissions weren't granted" ? "Anda harus mengizinkan/permission pada aplikasi di pengaturan" : "", ToastAndroid.SHORT)
             } else {
                 if (response.assets) {
-                    setImageData(response.assets[0].uri)
+                    setImageLink(response.assets[0].uri)
+                    setImageData(response.assets[0].base64)
                 }
-
             }
         });
     }
@@ -58,10 +59,35 @@ function AddProductView(props) {
                 ToastAndroid.show(response.errorMessage == "Permissions weren't granted" ? "Anda harus mengizinkan/permission pada aplikasi di pengaturan" : "", ToastAndroid.SHORT)
             } else {
                 if (response.assets) {
-                    setImageData(response.assets[0].uri)
+                    setImageLink(response.assets[0].uri)
+                    setImageData(response.assets[0].base64)
                 }
             }
         });
+    }
+    const addProduct = async () => {
+        try {
+            const response = await axiosFetch.post("/product/insert", {
+                name: name,
+                description: description,
+                sku: sku,
+                stock: stock,
+                category: categories[category],
+                price: price,
+                base64_image: imageData
+            })
+            const json = response.data
+            console.log(json)
+            if (json.success) {
+                props.navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'Homepage' }],
+                });
+            }
+        } catch (error) {
+            console.log(error)
+            ToastAndroid.show(error.message, ToastAndroid.SHORT)
+        }
     }
     return (
         <View style={style.main}>
@@ -100,7 +126,7 @@ function AddProductView(props) {
                         <MasonryList
                             data={categories}
                             keyExtractor={(item, index) => index.toString()}
-                            numColumns={3}
+                            numColumns={2}
                             showsVerticalScrollIndicator={false}
                             renderItem={({ item, i }) => <TouchableOpacity key={i.toString()} onPress={() => { setCategory(i) }} style={{ flexDirection: "row", padding: 5 }}>
                                 <View style={{ backgroundColor: i == category ? "#3B97CB" : "#CAECFF", padding: 12, borderRadius: 5 }}>
@@ -112,7 +138,7 @@ function AddProductView(props) {
                     <Text style={[style.robotonormal, { fontSize: 18, color: "#3B97CB", marginTop: 20 }]}>Price</Text>
                     <TextInput onChangeText={setPrice} value={price} keyboardType="numeric" style={[style.inputtext, { fontSize: 14, marginTop: 5, width: 150 }]} ></TextInput>
                     <TouchableOpacity onPress={toggleModalCamera} style={{ borderRadius: 30, backgroundColor: "white", width: "100%", aspectRatio: 1, marginTop: 30, justifyContent: "center", alignItems: "center" }}>
-                        {imageData == "" ? (
+                        {imageLink == "" ? (
                             <View style={{ alignItems: "center" }}>
                                 <Image source={require('../../assets/images/empty.png')}
                                     style={{ width: 150, height: 150 }}
@@ -121,7 +147,7 @@ function AddProductView(props) {
                                 <Text style={[style.robotobold, { fontSize: 24, color: "#3B97CB", marginTop: 20, textDecorationLine: "underline" }]}>Upload image here</Text>
                             </View>
                         ) : (
-                            <Image source={{ uri: imageData }}
+                            <Image source={{ uri: imageLink }}
                                 style={{ width: "100%", height: "100%", borderRadius: 30 }}
                             >
                             </Image>
@@ -129,7 +155,7 @@ function AddProductView(props) {
                     </TouchableOpacity>
                     <View style={{ marginTop: 35 }}>
                         <Button
-                        
+                            onPress={addProduct}
                             title={"Publish"} buttonStyle={[style.button]} titleStyle={[style.buttontext, { marginLeft: 5 }]}></Button>
                     </View>
                 </View>

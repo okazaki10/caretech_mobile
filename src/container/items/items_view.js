@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Dimensions, View, Image, ScrollView, TouchableOpacity, ImageBackground, TextInput } from 'react-native';
 import { Input, Text, Button } from 'react-native-elements';
 import LinearGradient from 'react-native-linear-gradient';
-import { formatPrice, URL } from '../../base_url';
+import { formatPrice, SERVER } from '../../base_url';
 import style, { colors } from '../../globalstyles';
 function ItemsView(props) {
     const { height, width } = Dimensions.get('window');
@@ -20,7 +20,7 @@ function ItemsView(props) {
             <ScrollView>
                 <View style={{ justifyContent: "center", flex: 1, width: "100%" }}>
                     <ImageBackground
-                        source={{ uri: URL + image_url }}
+                        source={{ uri: SERVER + image_url }}
                         style={{ width: "100%", height: 455 }}
                         imageStyle={{ borderBottomLeftRadius: 15, borderBottomRightRadius: 15 }}
                         resizeMode="cover"

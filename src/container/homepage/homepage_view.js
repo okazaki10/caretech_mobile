@@ -5,7 +5,7 @@ import { Dimensions, View, Image, ScrollView, TouchableOpacity, ImageBackground,
 import { Input, Text, Button } from 'react-native-elements';
 import LinearGradient from 'react-native-linear-gradient';
 import style, { colors } from '../../globalstyles';
-import axiosFetch, { formatPrice, URL } from '../../base_url';
+import axiosFetch, { formatPrice, SERVER } from '../../base_url';
 function HomepageView(props) {
     const { height, width } = Dimensions.get('window');
     const [product, setProduct] = useState([{}])
@@ -116,10 +116,10 @@ function HomepageView(props) {
                                     key={index}
                                     onPress={() => {
                                         props.navigation.navigate("Items", { name: item.name, description: item.description, price: item.price, image_url: item.image_url, category: item.category })
-                                        console.log(URL + item.image_url)
+                                        console.log(SERVER + item.image_url)
                                     }} style={{ justifyContent: "center", flex: 1, marginTop: 15, width: 176, marginLeft: index == 0 ? 45 : 20 }}>
                                     <ImageBackground
-                                        source={{ uri: URL + item.image_url }}
+                                        source={{ uri: SERVER + item.image_url }}
                                         style={{ width: "100%", height: 214 }}
                                         imageStyle={{ borderRadius: 15 }}
                                         resizeMode="cover"

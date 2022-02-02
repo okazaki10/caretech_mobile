@@ -45,7 +45,6 @@ function AddProductView(props) {
                 if (response.assets) {
                     setImageLink(response.assets[0].uri)
                     setImageData(response.assets[0].base64)
-                    console.log(response.assets[0].base64)
                 }
             }
         });

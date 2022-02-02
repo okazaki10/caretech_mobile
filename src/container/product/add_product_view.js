@@ -32,7 +32,7 @@ function AddProductView(props) {
         includeBase64: true,
         quality: 0.5,
     }
-    const [modalHide, setModalHide] = useState(false)
+
     const bukakamera = () => {
         toggleModalCamera()
         launchCamera(options, (response) => {

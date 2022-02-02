@@ -1,4 +1,5 @@
 import axios from "axios";
+//change the url based on your local ip
 export const URL = 'http://192.168.1.9:5000'
 const axiosFetch = axios.create({
     baseURL: URL

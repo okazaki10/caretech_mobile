@@ -45,6 +45,7 @@ function AddProductView(props) {
                 if (response.assets) {
                     setImageLink(response.assets[0].uri)
                     setImageData(response.assets[0].base64)
+                    console.log(response.assets[0].base64)
                 }
             }
         });
@@ -65,7 +66,17 @@ function AddProductView(props) {
             }
         });
     }
+    const [isBusy, setIsBusy] = useState(false)
     const addProduct = async () => {
+        if (isBusy) {
+            return
+        }
+        setIsBusy(true)
+        if (name == "" || description == "" || sku == "" || stock == "" || price == "") {
+            ToastAndroid.show("Please fill all the fields", ToastAndroid.SHORT)
+            setIsBusy(false)
+            return
+        }
         try {
             const response = await axiosFetch.post("/product/insert", {
                 name: name,
@@ -78,6 +89,7 @@ function AddProductView(props) {
             })
             const json = response.data
             console.log(json)
+            setIsBusy(false)
             if (json.success) {
                 props.navigation.reset({
                     index: 0,
@@ -87,7 +99,9 @@ function AddProductView(props) {
         } catch (error) {
             console.log(error)
             ToastAndroid.show(error.message, ToastAndroid.SHORT)
+            setIsBusy(false)
         }
+        setIsBusy(false)
     }
     return (
         <View style={style.main}>

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Dimensions, View, Image, ScrollView, TouchableOpacity, ImageBackground, TextInput } from 'react-native';
 import { Input, Text, Button } from 'react-native-elements';
 import LinearGradient from 'react-native-linear-gradient';
-import { URL } from '../../base_url';
+import { formatPrice, URL } from '../../base_url';
 import style, { colors } from '../../globalstyles';
 function ItemsView(props) {
     const { height, width } = Dimensions.get('window');
@@ -38,7 +38,7 @@ function ItemsView(props) {
                         </View>
                     </View>
                     <Text style={[style.robotobold, { fontSize: 44, color: "#3B97CB", marginTop: 12 }]}>{name}</Text>
-                    <Text style={[style.robotobold, { fontSize: 27, color: colors.blue }]}>$ {price}/pc</Text>
+                    <Text style={[style.robotobold, { fontSize: 27, color: colors.blue }]}>{formatPrice(price)}/pc</Text>
                     <Text style={[style.robotonormal, { fontSize: 16, color: "#838383", marginTop: 12 }]}>{description}</Text>
                     <View style={{ marginTop: 35, flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
                         <Button

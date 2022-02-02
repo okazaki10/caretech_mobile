@@ -1,14 +1,14 @@
 import { faStickyNote } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import React, { useState } from 'react';
-import { Dimensions, View, Image, ScrollView, TouchableOpacity, ImageBackground, ToastAndroid } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Dimensions, View, Image, ScrollView, TouchableOpacity, ImageBackground, ToastAndroid, RefreshControl } from 'react-native';
 import { Input, Text, Button } from 'react-native-elements';
 import LinearGradient from 'react-native-linear-gradient';
 import style, { colors } from '../../globalstyles';
-import axiosFetch, { URL } from '../../base_url';
+import axiosFetch, { formatPrice, URL } from '../../base_url';
 function HomepageView(props) {
     const { height, width } = Dimensions.get('window');
-    const [product, setProduct] = useState([])
+    const [product, setProduct] = useState([{}])
     const fetchData = async () => {
         try {
             const response = await axiosFetch.get("/product")
@@ -21,17 +21,27 @@ function HomepageView(props) {
             console.log(error)
             ToastAndroid.show(error.message, ToastAndroid.SHORT)
         }
+        setRefreshing(false)
     }
-    useState(() => {
+    useEffect(() => {
         fetchData()
     }, [])
+    const [refreshing, setRefreshing] = useState(false);
+
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        fetchData()
+    }, []);
+ 
     return (
         <View style={style.main}>
 
             <Image source={require('../../assets/images/ellipse.png')}
                 style={{ width: "100%", height: "33.5%", position: "absolute" }}
                 resizeMode='stretch'></Image>
-            <ScrollView>
+            <ScrollView refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }>
                 <View style={{ marginTop: 72, paddingBottom: 30 }}>
                     <View style={{ marginRight: 40, marginLeft: 40 }}>
                         <Text style={[style.robotobold, { color: "white" }]}>Welcome, John</Text>
@@ -102,10 +112,12 @@ function HomepageView(props) {
                     <ScrollView horizontal={true}>
                         {product.map((item, index) => (
                             item._id ? (
-                                <TouchableOpacity onPress={() => {
-                                    props.navigation.navigate("Items", { name: item.name, description: item.description, price: item.price, image_url: item.image_url,category:item.category })
-                                    console.log(URL + item.image_url)
-                                }} style={{ justifyContent: "center", flex: 1, marginTop: 15, width: 176, marginLeft: index == 0 ? 45 : 20 }}>
+                                <TouchableOpacity
+                                    key={index}
+                                    onPress={() => {
+                                        props.navigation.navigate("Items", { name: item.name, description: item.description, price: item.price, image_url: item.image_url, category: item.category })
+                                        console.log(URL + item.image_url)
+                                    }} style={{ justifyContent: "center", flex: 1, marginTop: 15, width: 176, marginLeft: index == 0 ? 45 : 20 }}>
                                     <ImageBackground
                                         source={{ uri: URL + item.image_url }}
                                         style={{ width: "100%", height: 214 }}
@@ -120,7 +132,7 @@ function HomepageView(props) {
                                         <View style={{ position: "absolute", flex: 1, bottom: 0, justifyContent: "flex-end", padding: 15, borderBottomLeftRadius: 5, borderBottomRightRadius: 5 }}>
                                             <View style={{ marginTop: 15 }}>
                                                 <Text style={[style.robotobold, { color: "white", flex: 1, fontSize: 23 }]}>{item.name}</Text>
-                                                <Text style={[style.robotonormal, { color: "white", flex: 1, fontSize: 16, marginTop: 2 }]}>$ {item.price}/pc</Text>
+                                                <Text style={[style.robotonormal, { color: "white", flex: 1, fontSize: 16, marginTop: 2 }]}>{formatPrice(item.price)}/pc</Text>
                                             </View>
                                         </View>
 
